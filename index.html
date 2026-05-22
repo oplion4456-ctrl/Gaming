@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANTI-GRAVITY // Defy Physics. Play Beyond Gravity.</title>
+  <meta name="description" content="Welcome to the high-energy gaming portal of the future. Defy physics, explore zero-G arenas, and experience next-gen interactive gravity distortions.">
+  
+  <!-- Tailwind CSS v4 Browser CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  
+  <!-- Custom Sci-Fi Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#050508] text-gray-200 select-none overflow-x-hidden min-h-screen relative">
+
+  <!-- Foreground Scanline CRT Overlay -->
+  <div class="scanlines"></div>
+
+  <!-- Interactive Zero-G Background Canvas Particle Field -->
+  <canvas id="bg-particles" class="fixed top-0 left-0 w-full h-full z-[-2] pointer-events-none"></canvas>
+  
+  <!-- Cybernetic Grid Overlay -->
+  <div class="bg-grid-overlay"></div>
+
+  <!-- Ambient Backdrop Glow Spots -->
+  <div class="fixed top-[20%] left-[10%] w-[350px] h-[350px] rounded-full bg-purple-950/20 blur-[100px] z-[-3] pointer-events-none"></div>
+  <div class="fixed bottom-[15%] right-[10%] w-[450px] h-[450px] rounded-full bg-cyan-950/15 blur-[120px] z-[-3] pointer-events-none"></div>
+
+  <!-- ==========================================
+       HEADER & NAVIGATION
+       ========================================== -->
+  <header class="sticky top-0 z-50 w-full px-6 py-4 md:px-12">
+    <div class="max-w-7xl mx-auto flex items-center justify-between glass-panel rounded-2xl px-6 py-3 border border-white/5 backdrop-blur-md">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="relative w-8 h-8 flex items-center justify-center">
+          <!-- Geometric vector core logo -->
+          <div class="absolute inset-0 border-2 border-cyan-400 rounded-lg rotate-45 group-hover:rotate-180 transition-transform duration-700"></div>
+          <div class="absolute inset-2 bg-purple-600 rounded-sm scale-75 animate-pulse"></div>
+        </div>
+        <span class="font-orbitron font-extrabold text-lg tracking-widest bg-gradient-to-r from-white via-cyan-300 to-purple-400 bg-clip-text text-transparent group-hover:text-glow-cyan transition-all">
+          ANTI-GRAVITY
+        </span>
+      </a>
+
+      <!-- Desktop Nav Menu -->
+      <nav class="hidden md:flex items-center gap-8 font-orbitron text-xs font-semibold tracking-wider text-gray-400">
+        <a href="#games" class="hover:text-cyan-300 transition duration-300 relative py-1 group">
+          ARENAS
+          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+        </a>
+        <a href="#telemetry" class="hover:text-purple-300 transition duration-300 relative py-1 group">
+          SYSTEM Telemetry
+          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-purple-500 group-hover:w-full transition-all duration-300"></span>
+        </a>
+        <a href="#" class="hover:text-pink-400 transition duration-300 relative py-1 group">
+          LEADERBOARDS
+          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-pink-500 group-hover:w-full transition-all duration-300"></span>
+        </a>
+      </nav>
+
+      <!-- Audio & Action CTA -->
+      <div class="flex items-center gap-4">
+        <!-- Interactive Synthesizer Core Activation Button -->
+        <button id="mute-toggle" class="flex items-center px-4 py-2 text-xs font-orbitron font-bold border border-purple-600 rounded-lg cursor-pointer bg-purple-950/10 hover:bg-purple-950/30 text-purple-400 hover:text-white transition duration-300 opacity-60">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+          </svg>
+          <span>AUDIO CORE: SILENT</span>
+        </button>
+
+        <!-- CTA Enter Arena Button -->
+        <button class="magnetic-btn hidden sm:flex items-center px-5 py-2 text-xs font-orbitron font-bold rounded-lg cursor-pointer bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-lg hover:shadow-cyan-500/25 transition duration-300">
+          ENTER CORE
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==========================================
+       HERO SECTION
+       ========================================== -->
+  <section class="relative px-6 pt-16 pb-20 md:pt-24 md:pb-32 flex flex-col items-center justify-center overflow-hidden">
+    <div class="max-w-4xl text-center z-10 flex flex-col items-center">
+      
+      <!-- Tech Badge Indicator -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-cyan-950/40 border border-cyan-500/30 rounded-full mb-8 css-float">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span class="font-mono text-[10px] tracking-widest text-cyan-400 font-bold uppercase">PHYSICS ENGINE: ACTIVE (V4.2.1)</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="font-orbitron font-black text-4xl sm:text-6xl md:text-7xl leading-tight tracking-tight mb-8">
+        DEFY PHYSICS.
+        <span class="block bg-gradient-to-r from-cyan-400 via-pink-400 to-purple-500 bg-clip-text text-transparent text-glow-cyan animate-pulse">
+          PLAY BEYOND GRAVITY.
+        </span>
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="max-w-2xl text-gray-400 text-sm sm:text-lg mb-12 font-medium tracking-wide leading-relaxed">
+        Step into the zero-gravity coordinate network. Steer, bounce, and maneuver cards, elements, and shields in real-time under a fully weightless inertia vector grid. Momentum is your shield; friction is your enemy.
+      </p>
+
+      <!-- CTA triggers -->
+      <div class="flex flex-col sm:flex-row items-center gap-6">
+        <!-- Launch Game CTA Button -->
+        <button class="magnetic-btn px-8 py-4 text-sm font-orbitron font-bold rounded-xl cursor-pointer bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold uppercase shadow-lg shadow-cyan-400/30 glow-border-cyan border border-cyan-300/40 transition duration-300">
+          LAUNCH GAME
+        </button>
+        <!-- Watch Gameplay CTA Button -->
+        <button class="magnetic-btn px-8 py-4 text-sm font-orbitron font-bold rounded-xl cursor-pointer bg-transparent hover:bg-white/5 border border-purple-500/50 hover:border-purple-400 text-purple-300 hover:text-white transition duration-300">
+          WATCH DEMO
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Background Tech Telemetry Accents -->
+    <div class="absolute left-10 top-1/3 hidden lg:block opacity-30 font-mono text-[10px] space-y-1">
+      <div>COOR_SET: X.482.029_Y</div>
+      <div>VEL_FACTOR: ZERO-G</div>
+      <div>VECTOR: UPWARD_INERTIA</div>
+    </div>
+    <div class="absolute right-10 top-1/3 hidden lg:block opacity-30 font-mono text-[10px] space-y-1 text-right">
+      <div>SECTOR: DENSE_RING_9</div>
+      <div>LFO_RATE: 0.25HZ</div>
+      <div>GRID_STIFF: 0.055</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       GAME CARDS SECTION
+       ========================================== -->
+  <section id="games" class="px-6 py-12 md:px-12 max-w-7xl mx-auto relative">
+    
+    <!-- Section Heading -->
+    <div class="flex items-end justify-between mb-16">
+      <div>
+        <h2 class="font-orbitron font-black text-2xl sm:text-4xl tracking-wider mb-2">
+          SELECT THE ARENA
+        </h2>
+        <p class="text-sm text-purple-400 font-mono tracking-widest font-semibold uppercase">
+          // INTERACTIVE ZERO-GRAVITY UI MODULES
+        </p>
+      </div>
+      <!-- HUD Line decoration -->
+      <div class="hidden md:block flex-1 h-[1px] bg-purple-900/40 mx-8 mb-3"></div>
+      <div class="hidden sm:block text-right font-mono text-[10px] text-gray-500 mb-2">
+        STRAY VECTORS: PUSH SHIELD AWAY WITH MOUSE
+      </div>
+    </div>
+
+    <!-- 3-Column Responsive Grid with Card Slots -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 min-h-[480px]">
+      
+      <!-- CARD 1 Slot: Orbital Bound -->
+      <div class="card-slot relative h-[460px] md:h-[480px]">
+        <!-- Physics floating element -->
+        <div class="physics-float-card absolute top-0 left-0 w-full h-full glass-panel cursor-pointer rounded-2xl p-6 flex flex-col justify-between border border-white/5 hover:border-purple-500 glow-border-purple group overflow-hidden transition-shadow duration-300">
+          <!-- Bracket highlights -->
+          <div class="bracket-corner bracket-tl text-purple-500"></div>
+          <div class="bracket-corner bracket-tr text-purple-500"></div>
+          <div class="bracket-corner bracket-bl text-purple-500"></div>
+          <div class="bracket-corner bracket-br text-purple-500"></div>
+          
+          <!-- Holographic graphic backdrop overlay inside card -->
+          <div class="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none"></div>
+          
+          <div>
+            <!-- Top HUD badges -->
+            <div class="flex items-center justify-between mb-6">
+              <span class="px-2 py-0.5 text-[9px] font-mono font-bold border border-purple-500/40 text-purple-300 rounded bg-purple-950/30 uppercase tracking-widest">
+                FPS ARENA
+              </span>
+              <span class="text-[10px] text-purple-500 font-mono font-bold animate-pulse">01 // ACT</span>
+            </div>
+            
+            <!-- Graphic Illustration (Holographic HUD) -->
+            <div class="h-32 w-full flex items-center justify-center relative mb-6">
+              <!-- Orbit lines graphic inside card -->
+              <div class="absolute w-24 h-24 border border-dashed border-purple-600/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
+              <div class="absolute w-16 h-16 border border-purple-500/40 rounded-full animate-[spin_6s_linear_infinite] flex items-center justify-center">
+                <div class="w-8 h-8 rounded-full border border-purple-400/80 flex items-center justify-center bg-purple-950/40 shadow-[0_0_15px_#9d4edd]">
+                  <!-- Mini core vector -->
+                  <div class="w-2.5 h-2.5 bg-white rounded-full"></div>
+                </div>
+              </div>
+              <div class="absolute w-2 h-2 bg-cyan-400 rounded-full top-8 left-16 animate-bounce"></div>
+            </div>
+            
+            <h3 class="font-orbitron font-extrabold text-xl mb-3 text-white group-hover:text-glow-purple transition-all tracking-wider">
+              ORBITAL BOUND
+            </h3>
+            <p class="text-xs text-gray-400 leading-relaxed font-medium">
+              Battle in standard absolute zero vacuum. Launch custom orbital pulses, ricochet kinetic shells, and navigate dynamic floating debris rings.
+            </p>
+          </div>
+          
+          <!-- Bottom Action Details -->
+          <div class="mt-6 border-t border-purple-950/40 pt-4 flex items-center justify-between">
+            <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase font-semibold">// NODE: V_SOLO</span>
+            <span class="text-xs text-white font-orbitron font-bold flex items-center group-hover:translate-x-1.5 transition-transform">
+              LAUNCH 
+              <svg class="w-3.5 h-3.5 ml-1 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- CARD 2 Slot: Singularity Rush -->
+      <div class="card-slot relative h-[460px] md:h-[480px]">
+        <!-- Physics floating element -->
+        <div class="physics-float-card absolute top-0 left-0 w-full h-full glass-panel cursor-pointer rounded-2xl p-6 flex flex-col justify-between border border-white/5 hover:border-cyan-400 glow-border-cyan group overflow-hidden transition-shadow duration-300">
+          <div class="bracket-corner bracket-tl text-cyan-400"></div>
+          <div class="bracket-corner bracket-tr text-cyan-400"></div>
+          <div class="bracket-corner bracket-bl text-cyan-400"></div>
+          <div class="bracket-corner bracket-br text-cyan-400"></div>
+          
+          <div class="absolute inset-0 bg-gradient-to-b from-cyan-950/15 via-transparent to-transparent pointer-events-none"></div>
+          
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <span class="px-2 py-0.5 text-[9px] font-mono font-bold border border-cyan-500/40 text-cyan-300 rounded bg-cyan-950/30 uppercase tracking-widest">
+                GRAV-RACER
+              </span>
+              <span class="text-[10px] text-cyan-400 font-mono font-bold animate-pulse">02 // ACT</span>
+            </div>
+            
+            <!-- Graphic Illustration (Cyan Singularity Engine HUD) -->
+            <div class="h-32 w-full flex items-center justify-center relative mb-6">
+              <!-- Radial tech lines -->
+              <div class="absolute w-28 h-28 border-2 border-cyan-950/50 rounded-full"></div>
+              <div class="absolute w-20 h-20 border border-cyan-500/20 rounded-full flex items-center justify-center animate-[spin_12s_linear_infinite]">
+                <div class="w-14 h-1 px-1 bg-cyan-500/30 rounded"></div>
+              </div>
+              <!-- Glowing warp singularity -->
+              <div class="w-12 h-12 rounded-full bg-cyan-950 border border-cyan-400/80 flex items-center justify-center shadow-[0_0_20px_#00f0ff] animate-pulse">
+                <svg class="w-6 h-6 text-cyan-300 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                </svg>
+              </div>
+            </div>
+            
+            <h3 class="font-orbitron font-extrabold text-xl mb-3 text-white group-hover:text-glow-cyan transition-all tracking-wider">
+              SINGULARITY RUSH
+            </h3>
+            <p class="text-xs text-gray-400 leading-relaxed font-medium">
+              Piloting gravity racing pods through warping black hole gravity fields. Warp space, bend corridors, and sling-shot past rival pods at mock speed.
+            </p>
+          </div>
+          
+          <div class="mt-6 border-t border-cyan-950/40 pt-4 flex items-center justify-between">
+            <span class="text-[10px] text-cyan-400 font-mono tracking-widest uppercase font-semibold">// NODE: V_PODS</span>
+            <span class="text-xs text-white font-orbitron font-bold flex items-center group-hover:translate-x-1.5 transition-transform">
+              LAUNCH 
+              <svg class="w-3.5 h-3.5 ml-1 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- CARD 3 Slot: Nebula Strike -->
+      <div class="card-slot relative h-[460px] md:h-[480px]">
+        <!-- Physics floating element -->
+        <div class="physics-float-card absolute top-0 left-0 w-full h-full glass-panel cursor-pointer rounded-2xl p-6 flex flex-col justify-between border border-white/5 hover:border-pink-500 glow-border-magenta group overflow-hidden transition-shadow duration-300">
+          <div class="bracket-corner bracket-tl text-pink-500"></div>
+          <div class="bracket-corner bracket-tr text-pink-500"></div>
+          <div class="bracket-corner bracket-bl text-pink-500"></div>
+          <div class="bracket-corner bracket-br text-pink-500"></div>
+          
+          <div class="absolute inset-0 bg-gradient-to-b from-pink-950/15 via-transparent to-transparent pointer-events-none"></div>
+          
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <span class="px-2 py-0.5 text-[9px] font-mono font-bold border border-pink-500/40 text-pink-300 rounded bg-pink-950/30 uppercase tracking-widest">
+                GRAV-BRAWLER
+              </span>
+              <span class="text-[10px] text-pink-500 font-mono font-bold animate-pulse">03 // ACT</span>
+            </div>
+            
+            <!-- Graphic Illustration (Magenta Cyber HUD) -->
+            <div class="h-32 w-full flex items-center justify-center relative mb-6">
+              <!-- Matrix polygons inside card -->
+              <div class="absolute w-20 h-20 border border-pink-600/30 rounded rotate-12 animate-[spin_15s_linear_infinite]"></div>
+              <div class="absolute w-20 h-20 border border-pink-500/40 rounded -rotate-12 animate-[spin_10s_linear_infinite]"></div>
+              <div class="w-10 h-10 bg-pink-950 border border-pink-400/80 flex items-center justify-center shadow-[0_0_15px_#ff007f] rotate-45">
+                <svg class="w-5 h-5 text-pink-300 -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
+            
+            <h3 class="font-orbitron font-extrabold text-xl mb-3 text-white group-hover:text-glow-magenta transition-all tracking-wider">
+              NEBULA STRIKE
+            </h3>
+            <p class="text-xs text-gray-400 leading-relaxed font-medium">
+              A physical tactics fighter where gravitational pressure waves are weapons. Launch enemies into black holes, reverse fields, and drop heavy kinetic mass.
+            </p>
+          </div>
+          
+          <div class="mt-6 border-t border-pink-950/40 pt-4 flex items-center justify-between">
+            <span class="text-[10px] text-pink-400 font-mono tracking-widest uppercase font-semibold">// NODE: V_BRAWL</span>
+            <span class="text-xs text-white font-orbitron font-bold flex items-center group-hover:translate-x-1.5 transition-transform">
+              LAUNCH 
+              <svg class="w-3.5 h-3.5 ml-1 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       LIVE STATS TERMINAL & TELEMETRY
+       ========================================== -->
+  <section id="telemetry" class="px-6 py-16 md:px-12 max-w-7xl mx-auto">
+    <div class="glass-panel rounded-3xl p-6 md:p-10 border border-white/5 relative overflow-hidden">
+      
+      <!-- Ambient backing tech designs -->
+      <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl"></div>
+      
+      <!-- Core Telemetry Dashboard Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 relative z-10">
+        
+        <!-- Column 1: Live Status Readout -->
+        <div class="flex flex-col justify-between min-h-[220px]">
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <span class="text-xs font-mono font-bold text-cyan-400 tracking-wider">// SYSTEM DIAGNOSTICS</span>
+              <div class="glow-dot"></div>
+            </div>
+            <h3 class="font-orbitron font-black text-2xl tracking-widest mb-6 uppercase">
+              GRID OPERATIONAL
+            </h3>
+          </div>
+          
+          <div class="space-y-6">
+            <!-- Parameter 1: Players Online -->
+            <div>
+              <span class="text-xs text-gray-500 font-mono uppercase block mb-1">PLAYERS IN ORBIT</span>
+              <div class="font-orbitron font-black text-4xl text-white tracking-widest bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent text-glow-cyan" id="telemetry-players">
+                142,803
+              </div>
+            </div>
+            
+            <!-- Parameter 2: Server ping and status -->
+            <div class="flex items-center justify-between border-t border-white/5 pt-4">
+              <div>
+                <span class="text-[10px] text-gray-500 font-mono uppercase block">LATENCY RESPONSE</span>
+                <span class="font-orbitron text-sm font-semibold text-white tracking-wider" id="telemetry-ping">12ms</span>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-gray-500 font-mono uppercase block">SERVER REGION</span>
+                <span class="font-orbitron text-sm font-semibold text-purple-400 tracking-wider">US_CENTRAL_CORE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Gravity Telemetry Counter -->
+        <div class="flex flex-col justify-between min-h-[220px] lg:border-x lg:border-white/5 lg:px-10">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono font-bold text-purple-400 tracking-wider">// GRAVITATIONAL READOUT</span>
+              <span class="px-2 py-0.5 text-[8px] border border-purple-500/30 text-purple-400 font-mono rounded">LIVE</span>
+            </div>
+            <h3 class="font-orbitron font-black text-2xl tracking-widest mb-6 uppercase">
+              TELEMETRY WAVE
+            </h3>
+          </div>
+          
+          <div class="space-y-6">
+            <!-- Live Vector Drift Readout -->
+            <div>
+              <span class="text-xs text-gray-500 font-mono uppercase block mb-1">CURRENT SPATIAL DRIFT</span>
+              <div class="font-orbitron font-black text-4xl text-purple-400 tracking-widest text-glow-purple" id="telemetry-drift">
+                0.0200G
+              </div>
+            </div>
+            
+            <!-- Technical constants -->
+            <div class="flex items-center justify-between border-t border-white/5 pt-4">
+              <div>
+                <span class="text-[10px] text-gray-500 font-mono uppercase block">SPRING RESISTANCE (k)</span>
+                <span class="font-mono text-xs font-medium text-white">0.055</span>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-gray-500 font-mono uppercase block">DAMPING FRICTION (c)</span>
+                <span class="font-mono text-xs font-medium text-cyan-400">0.810 (81%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Diagnostic scrolling code console -->
+        <div class="flex flex-col justify-between min-h-[220px]">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono font-bold text-pink-500 tracking-wider">// AGE CORE TERMINAL LOGS</span>
+              <span class="text-[10px] text-gray-500 font-mono animate-pulse">STREAMING</span>
+            </div>
+            
+            <!-- Terminal console block -->
+            <div class="h-32 w-full bg-black/50 border border-white/5 rounded-xl p-3 flex flex-col justify-between overflow-hidden">
+              <div id="terminal-log-body" class="w-full h-full overflow-y-auto space-y-1 pr-1 custom-scrollbar text-left">
+                <div class="text-xs text-purple-300 font-mono py-0.5"><span class="text-cyan-400 font-bold">[15:39:18]</span> LOG: AGE Gravity Core initialized on node AP-90</div>
+                <div class="text-xs text-purple-300 font-mono py-0.5"><span class="text-cyan-400 font-bold">[15:39:20]</span> LOG: Calibrating field vectors... k=0.055, c=0.81</div>
+                <div class="text-xs text-purple-300 font-mono py-0.5"><span class="text-cyan-400 font-bold">[15:39:22]</span> Telemetry: Spatial distortion dampening normalized</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-4 pt-2 flex items-center justify-between text-[9px] font-mono text-gray-500">
+            <span>PACKET STATUS: DUP_OK</span>
+            <span>SYSTEM SECURITY: SHIELDED</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FOOTER
+       ========================================== -->
+  <footer class="border-t border-white/5 py-12 px-6 md:px-12 mt-12 bg-black/20">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <!-- Footer Copyright branding -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <span class="font-orbitron font-extrabold text-sm text-white tracking-widest uppercase">
+          ANTI-GRAVITY // NETWORK
+        </span>
+        <span class="text-xs text-gray-500 font-mono mt-1">
+          &copy; 2026 ANTI-GRAVITY PORTAL. PROTOCOL LEVEL ZERO. ALL VECTORS AUTHORIZED.
+        </span>
+      </div>
+
+      <!-- Links -->
+      <div class="flex items-center gap-6 font-mono text-xs text-gray-500 uppercase">
+        <a href="#" class="hover:text-cyan-400 transition">SYSTEM PROTOCOL</a>
+        <span>/</span>
+        <a href="#" class="hover:text-purple-400 transition">COORDINATE MOCK</a>
+        <span>/</span>
+        <a href="#" class="hover:text-white transition">SECURITY BUFFER</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Master Interactive Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
