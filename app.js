@@ -151,6 +151,75 @@ class SciFiSynth {
     osc.start();
     osc.stop(this.ctx.currentTime + 0.4);
   }
+
+  playPickup() {
+    if (this.isMuted || !this.ctx) return;
+    
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gainNode = this.ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, now); // C5
+    osc.frequency.setValueAtTime(659.25, now + 0.07); // E5
+    
+    gainNode.gain.setValueAtTime(0.12, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+    
+    osc.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    
+    osc.start(now);
+    osc.stop(now + 0.22);
+  }
+
+  playShieldHit() {
+    if (this.isMuted || !this.ctx) return;
+    
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+    const gainNode = this.ctx.createGain();
+    
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+    
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(400, now);
+    filter.frequency.exponentialRampToValueAtTime(80, now + 0.3);
+    
+    gainNode.gain.setValueAtTime(0.35, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    
+    osc.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  playGameOver() {
+    if (this.isMuted || !this.ctx) return;
+    
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gainNode = this.ctx.createGain();
+    
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.linearRampToValueAtTime(50, now + 0.9);
+    
+    gainNode.gain.setValueAtTime(0.3, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+    
+    osc.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    
+    osc.start(now);
+    osc.stop(now + 0.9);
+  }
 }
 
 const synth = new SciFiSynth();
@@ -183,6 +252,7 @@ class ParticleSystem {
   }
   
   resize() {
+    if (!this.canvas) return;
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
   }
@@ -347,6 +417,7 @@ class CardPhysics {
   
   recalcAnchors() {
     this.cardModels.forEach((model) => {
+      if (!model.containerEl) return;
       const rect = model.containerEl.getBoundingClientRect();
       model.width = rect.width;
       model.height = rect.height;
@@ -359,6 +430,7 @@ class CardPhysics {
   update() {
     // Re-verify anchors in case scrolling or reflow happened
     this.cardModels.forEach((model) => {
+      if (!model.containerEl) return;
       const rect = model.containerEl.getBoundingClientRect();
       model.anchorX = rect.left + rect.width / 2;
       model.anchorY = rect.top + rect.height / 2;
@@ -481,6 +553,7 @@ function initTelemetry() {
   let currentLogIdx = 0;
   
   setInterval(() => {
+    if (!terminalBody) return;
     const timeStr = new Date().toLocaleTimeString().split(' ')[0];
     const logLine = document.createElement('div');
     logLine.className = 'text-xs text-purple-300 font-mono py-0.5 opacity-0 transition-opacity duration-300';
@@ -504,7 +577,389 @@ function initTelemetry() {
 }
 
 // ==========================================
-// 5. MAIN RENDER LOOP & INITS
+// 5. PLAYABLE ZERO-G ARCADE GAME
+// ==========================================
+class ArcadeGame {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    if (!this.canvas) return;
+    this.ctx = this.canvas.getContext('2d');
+    this.gameState = 'idle'; // idle, playing, game-over
+    this.score = 0;
+    this.shield = 100;
+    
+    this.player = { x: 100, y: 225, radius: 12, targetY: 225, targetX: 100, speed: 0.15 };
+    this.obstacles = [];
+    this.collectibles = [];
+    this.particles = [];
+    
+    this.spawnTimer = 0;
+    this.shake = 0;
+    this.animationId = null;
+    
+    // Mouse coords relative to canvas
+    this.mouse = { x: 100, y: 225 };
+    
+    this.setupEvents();
+    this.resize();
+  }
+  
+  resize() {
+    // Fixed internal resolution for consistent gameplay physics
+    this.canvas.width = 800;
+    this.canvas.height = 450;
+  }
+  
+  setupEvents() {
+    this.canvas.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      // Calculate normalized coordinates on our internal 800x450 grid
+      this.mouse.x = ((e.clientX - rect.left) / rect.width) * this.canvas.width;
+      this.mouse.y = ((e.clientY - rect.top) / rect.height) * this.canvas.height;
+    });
+    
+    document.getElementById('start-game-btn').addEventListener('click', () => {
+      this.start();
+    });
+  }
+  
+  start() {
+    this.score = 0;
+    this.shield = 100;
+    this.player.x = 100;
+    this.player.y = 225;
+    this.player.targetX = 100;
+    this.player.targetY = 225;
+    this.obstacles = [];
+    this.collectibles = [];
+    this.particles = [];
+    this.gameState = 'playing';
+    this.shake = 0;
+    
+    document.getElementById('arcade-screen').classList.add('hidden');
+    document.getElementById('game-shield').innerText = '100%';
+    document.getElementById('game-shield').className = 'text-cyan-400 font-bold';
+    document.getElementById('game-score').innerText = '0000';
+    
+    synth.playBeep(523, 150, 0.1); // High note to start
+    
+    if (this.animationId) cancelAnimationFrame(this.animationId);
+    this.loop();
+  }
+  
+  gameOver() {
+    this.gameState = 'game-over';
+    document.getElementById('arcade-title').innerText = 'CORE CRITICAL';
+    document.getElementById('arcade-desc').innerHTML = `
+      <span class="text-pink-500 font-bold block mb-2 text-sm uppercase">SHIELDS ENTIRELY DEPLETED</span>
+      Your zero-G pod collapsed in the gravitational singularity vector.<br>
+      <span class="text-white font-bold text-base block mt-4">FINAL SCORE: ${this.score}</span>
+    `;
+    document.getElementById('start-game-btn').innerText = 'REBOOT THRUSTERS';
+    document.getElementById('arcade-screen').classList.remove('hidden');
+    
+    synth.playGameOver();
+  }
+  
+  spawn() {
+    this.spawnTimer++;
+    if (this.spawnTimer % 45 === 0) { // spawn obstacle
+      this.obstacles.push({
+        x: this.canvas.width + 30,
+        y: Math.random() * (this.canvas.height - 60) + 30,
+        vx: -(Math.random() * 3 + 2.5),
+        radius: Math.random() * 10 + 12,
+        pulseSpeed: Math.random() * 0.05 + 0.02,
+        pulseVal: 0
+      });
+    }
+    
+    if (this.spawnTimer % 65 === 0) { // spawn collectible
+      this.collectibles.push({
+        x: this.canvas.width + 30,
+        y: Math.random() * (this.canvas.height - 60) + 30,
+        vx: -(Math.random() * 2 + 2),
+        radius: 8,
+        pulseVal: 0
+      });
+    }
+  }
+  
+  update() {
+    this.spawn();
+    
+    // Smooth zero-G mouse follow inertia
+    this.player.x += (this.mouse.x - this.player.x) * this.player.speed;
+    this.player.y += (this.mouse.y - this.player.y) * this.player.speed;
+    
+    // Bounds clamping
+    this.player.x = Math.max(20, Math.min(this.canvas.width - 20, this.player.x));
+    this.player.y = Math.max(20, Math.min(this.canvas.height - 20, this.player.y));
+    
+    // Update Obstacles
+    for (let i = this.obstacles.length - 1; i >= 0; i--) {
+      const o = this.obstacles[i];
+      o.x += o.vx;
+      o.pulseVal += o.pulseSpeed;
+      
+      // Collision detection with player
+      const dx = o.x - this.player.x;
+      const dy = o.y - this.player.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      
+      if (dist < o.radius + this.player.radius) {
+        // Collided!
+        this.shield -= 25;
+        this.shake = 15;
+        synth.playShieldHit();
+        
+        // Spawn debris particles
+        this.spawnExplosion(o.x, o.y, '#9d4edd', 12);
+        
+        // Remove obstacle
+        this.obstacles.splice(i, 1);
+        
+        // Update shield HUD
+        const shieldHUD = document.getElementById('game-shield');
+        shieldHUD.innerText = `${this.shield}%`;
+        if (this.shield <= 50) {
+          shieldHUD.className = 'text-pink-500 font-bold animate-pulse';
+        }
+        
+        if (this.shield <= 0) {
+          this.gameOver();
+          return;
+        }
+        continue;
+      }
+      
+      // Offscreen remove
+      if (o.x < -40) {
+        this.obstacles.splice(i, 1);
+      }
+    }
+    
+    // Update Collectibles
+    for (let i = this.collectibles.length - 1; i >= 0; i--) {
+      const c = this.collectibles[i];
+      c.x += c.vx;
+      c.pulseVal += 0.08;
+      
+      const dx = c.x - this.player.x;
+      const dy = c.y - this.player.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      
+      if (dist < c.radius + this.player.radius) {
+        // Collected!
+        this.score += 100;
+        this.shield = Math.min(100, this.shield + 5);
+        synth.playPickup();
+        
+        // Spawn sparks
+        this.spawnExplosion(c.x, c.y, '#00f0ff', 8);
+        
+        this.collectibles.splice(i, 1);
+        
+        document.getElementById('game-score').innerText = String(this.score).padStart(4, '0');
+        const shieldHUD = document.getElementById('game-shield');
+        shieldHUD.innerText = `${this.shield}%`;
+        if (this.shield > 50) {
+          shieldHUD.className = 'text-cyan-400 font-bold';
+        }
+        continue;
+      }
+      
+      if (c.x < -40) {
+        this.collectibles.splice(i, 1);
+      }
+    }
+    
+    // Update Particles
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha -= 0.03;
+      if (p.alpha <= 0) {
+        this.particles.splice(i, 1);
+      }
+    }
+    
+    // Decay shake
+    if (this.shake > 0) this.shake *= 0.9;
+  }
+  
+  spawnExplosion(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 4 + 1.5;
+      this.particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: Math.random() * 2 + 1,
+        color: color,
+        alpha: 1
+      });
+    }
+  }
+  
+  draw() {
+    this.ctx.save();
+    
+    // Screen shake translate
+    if (this.shake > 0.5) {
+      const dx = (Math.random() - 0.5) * this.shake;
+      const dy = (Math.random() - 0.5) * this.shake;
+      this.ctx.translate(dx, dy);
+    }
+    
+    // Clear canvas
+    this.ctx.fillStyle = '#030306';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Draw sci-fi grid overlay onto canvas background
+    this.ctx.strokeStyle = 'rgba(157, 78, 221, 0.04)';
+    this.ctx.lineWidth = 1;
+    const gridSz = 30;
+    for (let x = 0; x < this.canvas.width; x += gridSz) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, this.canvas.height);
+      this.ctx.stroke();
+    }
+    for (let y = 0; y < this.canvas.height; y += gridSz) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, y);
+      this.ctx.lineTo(this.canvas.width, y);
+      this.ctx.stroke();
+    }
+    
+    // Draw obstacles (Collapsing Singularities)
+    for (let o of this.obstacles) {
+      this.ctx.save();
+      const currentRadius = o.radius + Math.sin(o.pulseVal) * 3;
+      
+      // Draw outer gravity distortion rings
+      this.ctx.beginPath();
+      this.ctx.arc(o.x, o.y, currentRadius * 1.5, 0, Math.PI * 2);
+      this.ctx.strokeStyle = 'rgba(157, 78, 221, 0.15)';
+      this.ctx.lineWidth = 1.5;
+      this.ctx.setLineDash([4, 4]);
+      this.ctx.stroke();
+      
+      // Draw inner vortex core
+      this.ctx.beginPath();
+      this.ctx.arc(o.x, o.y, currentRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = 'rgba(15, 10, 30, 0.9)';
+      this.ctx.strokeStyle = '#9d4edd';
+      this.ctx.lineWidth = 2.5;
+      this.ctx.shadowBlur = 15;
+      this.ctx.shadowColor = '#c77dff';
+      this.ctx.fill();
+      this.ctx.stroke();
+      
+      this.ctx.restore();
+    }
+    
+    // Draw collectibles (Glowing Energy Cores)
+    for (let c of this.collectibles) {
+      this.ctx.save();
+      const rot = c.pulseVal;
+      
+      this.ctx.translate(c.x, c.y);
+      this.ctx.rotate(rot);
+      
+      // Draw diamond core shape
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, -c.radius);
+      this.ctx.lineTo(c.radius, 0);
+      this.ctx.lineTo(0, c.radius);
+      this.ctx.lineTo(-c.radius, 0);
+      this.ctx.closePath();
+      
+      this.ctx.fillStyle = 'rgba(0, 240, 255, 0.25)';
+      this.ctx.strokeStyle = '#00f0ff';
+      this.ctx.lineWidth = 2;
+      this.ctx.shadowBlur = 10;
+      this.ctx.shadowColor = '#00f0ff';
+      this.ctx.fill();
+      this.ctx.stroke();
+      
+      this.ctx.restore();
+    }
+    
+    // Draw Debris Particles
+    for (let p of this.particles) {
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      this.ctx.fillStyle = p.color;
+      this.ctx.globalAlpha = p.alpha;
+      this.ctx.fill();
+      this.ctx.restore();
+    }
+    
+    // Draw player ship (Cyan Delta Jet Pod)
+    this.ctx.save();
+    this.ctx.translate(this.player.x, this.player.y);
+    
+    // Jet flame behind player
+    if (this.gameState === 'playing') {
+      this.ctx.beginPath();
+      this.ctx.moveTo(-15, -4);
+      this.ctx.lineTo(-28 - Math.random() * 8, 0);
+      this.ctx.lineTo(-15, 4);
+      this.ctx.closePath();
+      this.ctx.fillStyle = Math.random() > 0.4 ? '#00f0ff' : '#9d4edd';
+      this.ctx.shadowBlur = 8;
+      this.ctx.shadowColor = '#00f0ff';
+      this.ctx.fill();
+    }
+    
+    // Vector triangular pod hull
+    this.ctx.beginPath();
+    this.ctx.moveTo(18, 0); // nose cone pointing right
+    this.ctx.lineTo(-12, -11); // top wing
+    this.ctx.lineTo(-6, 0);   // engine mount
+    this.ctx.lineTo(-12, 11);  // bottom wing
+    this.ctx.closePath();
+    
+    this.ctx.fillStyle = 'rgba(10, 15, 28, 0.95)';
+    this.ctx.strokeStyle = '#00f0ff';
+    this.ctx.lineWidth = 2.5;
+    this.ctx.shadowBlur = 15;
+    this.ctx.shadowColor = '#00f0ff';
+    this.ctx.fill();
+    this.ctx.stroke();
+    
+    // Pilot canopy glass
+    this.ctx.beginPath();
+    this.ctx.moveTo(3, 0);
+    this.ctx.lineTo(-6, -4);
+    this.ctx.lineTo(-6, 4);
+    this.ctx.closePath();
+    this.ctx.fillStyle = '#9d4edd';
+    this.ctx.fill();
+    
+    this.ctx.restore();
+    
+    this.ctx.restore();
+  }
+  
+  loop() {
+    if (this.gameState !== 'playing') return;
+    
+    this.update();
+    this.draw();
+    
+    this.animationId = requestAnimationFrame(() => this.loop());
+  }
+}
+
+// ==========================================
+// 6. MAIN RENDER LOOP & INITS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   // Check for canvas
@@ -530,9 +985,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  // Core physics loop
+  // Wire up the Arcade Overlay triggers
+  const gameOverlay = document.getElementById('game-overlay');
+  const closeGameBtn = document.getElementById('close-game');
+  const arcade = new ArcadeGame('arcade-canvas');
+  
+  function launchGame() {
+    if (!gameOverlay) return;
+    gameOverlay.classList.remove('hidden');
+    gameOverlay.classList.add('flex');
+    synth.init();
+    
+    // Auto unmute synth to give high-energy feel immediately!
+    if (synth.isMuted && muteBtn) {
+      synth.toggleMute(muteBtn);
+    }
+    synth.playBeep(480, 80, 0.08);
+  }
+  
+  function exitGame() {
+    if (!gameOverlay) return;
+    gameOverlay.classList.remove('flex');
+    gameOverlay.classList.add('hidden');
+    if (arcade.gameState === 'playing') {
+      arcade.gameState = 'idle';
+      if (arcade.animationId) cancelAnimationFrame(arcade.animationId);
+    }
+    // Show start overlay screen for next run
+    document.getElementById('arcade-screen').classList.remove('hidden');
+    document.getElementById('arcade-title').innerText = 'SINGULARITY RUN';
+    document.getElementById('arcade-desc').innerHTML = `
+      Dodge the collapsing purple gravity singularities. Collect floating cyan energy cores to power your shields and boost your score. Use your cursor to steer your weightless pod.
+    `;
+    document.getElementById('start-game-btn').innerText = 'INITIATE THRUSTERS';
+    
+    synth.playBeep(320, 100, 0.08);
+  }
+  
+  const heroLaunchBtn = document.getElementById('hero-launch-btn');
+  const enterCoreBtn = document.getElementById('enter-core-btn');
+  const triggerCard1 = document.getElementById('card-trigger-1');
+  const triggerCard2 = document.getElementById('card-trigger-2');
+  const triggerCard3 = document.getElementById('card-trigger-3');
+  
+  if (heroLaunchBtn) heroLaunchBtn.addEventListener('click', launchGame);
+  if (enterCoreBtn) enterCoreBtn.addEventListener('click', launchGame);
+  if (triggerCard1) triggerCard1.addEventListener('click', launchGame);
+  if (triggerCard2) triggerCard2.addEventListener('click', launchGame);
+  if (triggerCard3) triggerCard3.addEventListener('click', launchGame);
+  if (closeGameBtn) closeGameBtn.addEventListener('click', exitGame);
+  
+  // Close on ESC keypress
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && gameOverlay && !gameOverlay.classList.contains('hidden')) {
+      exitGame();
+    }
+  });
+  
+  // Core background render loop
   function loop() {
-    // Update particle states and draw
+    // Update background particle states and draw
     backgroundParticles.update();
     backgroundParticles.draw();
     
